@@ -1,14 +1,21 @@
 import maze
 import sys
 from grid import create_maze, generate_maze
+from output import write_maze_file
+from display import display_maze
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
     config_file = sys.argv[1]
-    config = maze.read_config('config.txt')
+    config = maze.read_config(config_file)
     parsed = maze.parse_config(config)
 
-    maze = create_maze(parsed['WIDTH'], parsed['HEIGHT'])
+    grid = create_maze(parsed['WIDTH'], parsed['HEIGHT'])
+    display_maze(
+    grid,
+    parsed["ENTRY"],
+    parsed["EXIT"]
+)
     # generate_maze(maze)
