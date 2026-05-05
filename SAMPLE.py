@@ -1,32 +1,41 @@
-import sys
-import maze
-from grid import create_maze, generate_maze
-from output import write_maze_file
-from display import display_maze
+import random
 
+def generate_maze(maze):
+    height = len(maze)
+    width = len(maze[0])
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python3 a_maze_ing.py config.txt")
-        sys.exit(1)
+    # começar no (0,0)
+    x, y = 0, 0
+    maze[y][x].visited = True
 
-    config_file = sys.argv[1]
-    config = maze.read_config(config_file)
-    parsed = maze.parse_config(config)
+    stack = [(x, y)]
 
-    grid = create_maze(parsed['WIDTH'], parsed['HEIGHT'])
+    while stack:
+        x, y = stack[-1]
 
-    generate_maze(grid)
+        # vizinhos não visitados
+        neighbors = [
+            (direction, nx, ny)
+            for direction, nx, ny in get_neighbors(maze, x, y)
+            if not maze[ny][nx].visited
+        ]
 
-    display_maze(
-        grid,
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
+        if neighbors:
+            # escolhe um aleatório
+            direction, nx, ny = random.choice(neighbors)
 
-    write_maze_file(
-        grid,
-        parsed["OUTPUT_FILE"],
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
+            current_cell = maze[y][x]
+            next_cell = maze[ny][nx]
+
+            # remove parede
+            remove_walls(current_cell, next_cell, direction)
+
+            # marca visitado
+            next_cell.visited = True
+
+            # avança
+            stack.append((nx, ny))
+
+        else:
+            # voltar atrás
+            stack.pop()
