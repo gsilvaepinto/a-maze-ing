@@ -3,30 +3,35 @@ import maze
 from grid import create_maze, generate_maze
 from output import write_maze_file
 from display import display_maze
+from solver import solve_bfs
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python3 a_maze_ing.py config.txt")
+        print("Usage: python3 main.py config.txt")
         sys.exit(1)
 
-    config_file = sys.argv[1]
-    config = maze.read_config(config_file)
-    parsed = maze.parse_config(config)
+    config  = maze.read_config(sys.argv[1])
+    parsed  = maze.parse_config(config)
 
-    grid = create_maze(parsed['WIDTH'], parsed['HEIGHT'])
+    entry  = parsed["ENTRY"]
+    exit_  = parsed["EXIT"]
 
+    # 1. criar e gerar
+    grid = create_maze(parsed["WIDTH"], parsed["HEIGHT"])
     generate_maze(grid)
 
-    display_maze(
-        grid,
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
+    # 2. mostrar maze sem solução
+    print("\n=== MAZE ===")
+    display_maze(grid, entry, exit_)
 
-    write_maze_file(
-        grid,
-        parsed["OUTPUT_FILE"],
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
+    # 3. resolver com BFS
+    path = solve_bfs(grid, entry, exit_)
+
+    if path:
+        display_maze(grid, entry, exit_, path=path)
+    else:
+        print("\nSem solução encontrada.")
+
+    # 4. escrever ficheiro
+    write_maze_file(grid, parsed["OUTPUT_FILE"], entry, exit_)

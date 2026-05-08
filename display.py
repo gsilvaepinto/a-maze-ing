@@ -1,41 +1,51 @@
-RESET = "\033[0m"
-WHITE = "\033[97m"
-RED = "\033[91m"
+RESET  = "\033[0m"
+WHITE  = "\033[97m"
+RED    = "\033[91m"
 PURPLE = "\033[95m"
+YELLOW = "\033[93m"
+CYAN   = "\033[96m"
+
+W = WHITE + "██" + RESET   
+S = "  "                   
 
 
-def display_maze(maze, entry=None, exit_=None):
-    WALL = WHITE + "██" + RESET
-    SPACE = "  "
+def display_maze(maze, entry=None, exit_=None, path=None):
+    """
+    Desenha o maze no terminal.
+    - entry : (x, y) célula de entrada  → roxo
+    - exit_ : (x, y) célula de saída   → vermelho
+    - path  : list[(x,y)] solução BFS  → amarelo
+    """
+    path_set = set(path) if path else set()
+    height   = len(maze)
+    width    = len(maze[0])
 
-    width = len(maze[0])
+    
+    print(W * (width * 2 + 1))
 
-    print(WALL * (width * 2 + 1))
+    for y in range(height):
+        
+        mid = W
+        for x in range(width):
+            cell = maze[y][x]
 
-    for y, row in enumerate(maze):
-        middle = WALL
-        bottom = WALL
-
-        for x, cell in enumerate(row):
-
-            if entry == (x, y):
-                content = PURPLE + "██" + RESET
-            elif exit_ == (x, y):
-                content = RED + "██" + RESET
+            if (x, y) == entry:
+                mid += PURPLE + "██" + RESET
+            elif (x, y) == exit_:
+                mid += RED + "██" + RESET
+            elif (x, y) in path_set:
+                mid += YELLOW + "✧ " + RESET
             else:
-                content = SPACE
+                mid += S
 
-            middle += content
+            mid += W if cell.walls["E"] else S
 
-            if cell.walls["E"]:
-                middle += WALL
-            else:
-                middle += SPACE
+        print(mid)
 
-            if cell.walls["S"]:
-                bottom += WALL + WALL
-            else:
-                bottom += SPACE + WALL
 
-        print(middle)
-        print(bottom)
+        bot = W
+        for x in range(width):
+            cell = maze[y][x]
+            bot += W if cell.walls["S"] else S
+            bot += W   
+        print(bot)

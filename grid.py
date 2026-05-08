@@ -29,18 +29,38 @@ def get_neighbors(maze, x, y):
 
 
 def generate_maze(maze):
+    height = len(maze)
+    width = len(maze[0])
+
     x, y = 0, 0
     maze[y][x].visited = True
 
-    neighbors = get_neighbors(maze, x, y)
-    if neighbors:
-        direction, nx, ny = random.choice(neighbors)
-        current_cell = maze[y][x]
-        next_cell = maze[ny][nx]
-        remove_walls(current_cell, next_cell, direction)
-        x, y = nx, ny
-        maze[y][x].visited = True
-        print("Nova posição:", x, y)
+    stack = [(x, y)]
+
+    while stack:
+        x, y = stack[-1]
+
+        neighbors = [
+            (direction, nx, ny)
+            for direction, nx, ny in get_neighbors(maze, x, y)
+            if not maze[ny][nx].visited
+        ]
+
+        if neighbors:
+            
+            direction, nx, ny = random.choice(neighbors)
+
+            current_cell = maze[y][x]
+            next_cell = maze[ny][nx]
+
+            remove_walls(current_cell, next_cell, direction)
+
+            next_cell.visited = True
+
+            stack.append((nx, ny))
+
+        else:
+            stack.pop()
 
 
 def remove_walls(current, next_cell, direction):
