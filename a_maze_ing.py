@@ -1,32 +1,18 @@
 import sys
-import maze
-from grid import create_maze, generate_maze
-from output import write_maze_file
+import os
+from maze_generator import MazeGenerator
 from display import display_maze
-
+from parse import validator, read_config, parse_config
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python3 a_maze_ing.py config.txt")
-        sys.exit(1)
+    validator(sys.argv)
+    config = read_config(sys.argv[1])
+    parsed = parse_config(config)
 
-    config_file = sys.argv[1]
-    config = maze.read_config(config_file)
-    parsed = maze.parse_config(config)
 
-    grid = create_maze(parsed['WIDTH'], parsed['HEIGHT'])
-
-    generate_maze(grid)
-
-    display_maze(
-        grid,
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
-
-    write_maze_file(
-        grid,
-        parsed["OUTPUT_FILE"],
-        parsed["ENTRY"],
-        parsed["EXIT"]
-    )
+# 1. criar e gerar
+    maze_test = MazeGenerator(10, 10, 100)
+    maze_test.generate(True)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    display_maze(maze_test.grid, (8, 0), (5, 5))
+    input()
