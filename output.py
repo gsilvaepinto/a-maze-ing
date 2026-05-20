@@ -12,7 +12,8 @@ def cell_to_hex(cell) -> str:
     return format(value, 'X')
 
 
-def write_maze_file(maze, output_file: str, entry: tuple[int, int], exit: tuple[int, int]) -> None:
+def write_maze_file(maze, output_file: str, entry: tuple[int, int],
+                    exit: tuple[int, int]) -> None:
     with open(output_file, 'w') as file:
         for row in maze:
             line = ''
@@ -22,4 +23,4 @@ def write_maze_file(maze, output_file: str, entry: tuple[int, int], exit: tuple[
         file.write('\n')
         file.write(f'{entry[0]},{entry[1]}\n')
         file.write(f'{exit[0]},{exit[1]}\n')
-        file.write('\n') # ADD PATH
+        file.write('\n')  # ADD PATH

@@ -1,35 +1,40 @@
+from __future__ import annotations
+
 import sys
+from typing import Any
 
 
-def validator(argv: list[str]):
-    if len(argv) < 2 or len(argv) > 2:
+def validator(argv: list[str]) -> None:
+    if len(argv) < 2 or len(argv) > 2 and argv[1] != "config.txt":
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
-    if argv[1] != "config.txt":
-        print("Usage: python3 a_maze_ing.py config.txt")
+
+
+def read_config(file_path: str) -> dict[str, str]:
+    config: dict[str, str] = {}
+    try:
+        with open(file_path) as file:
+            for line in file:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                key, value = line.split('=', 1)
+                config[key.strip()] = value.strip()
+    except FileNotFoundError:
+        print("Error")
         sys.exit(1)
 
-
-def read_config(file_path) -> dict:
-    config = {}
-    with open(file_path) as file:
-        for line in file:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-            key, value = line.split('=', 1)
-            config[key.strip()] = value.strip()
     return config
 
 
-def parse_coordinates(value: str) -> tuple[(int, int)]:
+def parse_coordinates(value: str) -> tuple[int, int]:
     x, y = value.split(',')
     return int(x), int(y)
 
 
-def parse_config(config: dict):
-    parsed = {}
-    config_report = []
+def parse_config(config: dict[str, str]) -> dict[str, Any]:
+    parsed: dict[str, Any] = {}
+    config_report: list[str] = []
 
     try:
         parsed['WIDTH'] = int(config['WIDTH'])
@@ -57,7 +62,7 @@ def parse_config(config: dict):
         config_report.append("OUTPUT_FILE - invalid parameter")
 
     try:
-        parsed['PERFECT"'] = config["PERFECT"] == "True"
+        parsed['PERFECT'] = config['PERFECT'] == "True"
     except ValueError:
         config_report.append("PERFECT - invalid parameter")
 

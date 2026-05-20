@@ -1,22 +1,30 @@
+from maze_generator import Cell
+
 RESET = "\033[0m"
 WHITE = "\033[97m"
 RED = "\033[91m"
 PURPLE = "\033[95m"
 YELLOW = "\033[93m"
 CYAN = "\033[96m"
+GRAY = "\033[90m"
 
 W = WHITE + "██" + RESET
 S = "  "
 
 
-def display_maze(maze, entry=None, exit_=None, path=None):
+def display_maze(
+    maze: list[list[Cell]],
+    entry: tuple[int, int] | None = None,
+    exit_: tuple[int, int] | None = None,
+    path: list[tuple[int, int]] | None = None,
+) -> None:
     """
     Desenha o maze no terminal.
     - entry : (x, y) célula de entrada  → roxo
     - exit_ : (x, y) célula de saída   → vermelho
     - path  : list[(x,y)] solução BFS  → amarelo
     """
-    path_set = set(path) if path else set()
+    path_set: set[tuple[int, int]] = set(path) if path else set()
     height = len(maze)
     width = len(maze[0])
 
@@ -31,6 +39,8 @@ def display_maze(maze, entry=None, exit_=None, path=None):
             if (x, y) == entry:
                 mid += PURPLE + "██" + RESET
             elif (x, y) == exit_:
+                mid += RED + "██" + RESET
+            elif cell.is_42:
                 mid += RED + "██" + RESET
             elif (x, y) in path_set:
                 mid += YELLOW + "✧ " + RESET
