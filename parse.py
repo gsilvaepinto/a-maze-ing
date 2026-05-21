@@ -4,6 +4,11 @@ import sys
 from typing import Any
 
 
+class ParsingError(Exception):
+    def __init__(self, message="") -> None:
+        super().__init__(message)
+
+
 def validator(argv: list[str]) -> None:
     if len(argv) < 2 or len(argv) > 2 and argv[1] != "config.txt":
         print("Usage: python3 a_maze_ing.py config.txt")
@@ -38,12 +43,18 @@ def parse_config(config: dict[str, str]) -> dict[str, Any]:
 
     try:
         parsed['WIDTH'] = int(config['WIDTH'])
-    except ValueError:
+        if parsed['WIDTH'] <= 0:
+            raise ParsingError("WIDTH - invalid parameter width cant be 0 or"
+                               " negative")
+    except (ValueError, ParsingError):
         config_report.append("WIDTH - invalid parameter")
 
     try:
         parsed['HEIGHT'] = int(config['HEIGHT'])
-    except ValueError:
+        if parsed['HEIGHT'] <= 0:
+            raise ParsingError(("HEIGTH - invalid parameter height cant be 0"
+                                " or negative"))
+    except (ValueError, ParsingError):
         config_report.append("HEIGHT - invalid parameter")
 
     try:
@@ -67,7 +78,8 @@ def parse_config(config: dict[str, str]) -> dict[str, Any]:
         config_report.append("PERFECT - invalid parameter")
 
     if config_report:
-        config_report.append("==== CONFIG.TXT BAD VALUES REPORT ====\n")
+        print("ERROR: UNABLE TO REPRODUCE THE MAZE")
+        print("==== CONFIG.TXT INVALID PARAMETERS REPORT ====\n")
         for error in config_report:
             print(f"{error}")
         sys.exit(1)
