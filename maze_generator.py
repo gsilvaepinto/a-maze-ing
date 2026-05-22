@@ -2,6 +2,7 @@ from __future__ import annotations
 import random
 from collections import deque
 from typing import Optional
+import sys
 
 
 class Cell:
@@ -211,16 +212,17 @@ class MazeGenerator:
 
             # Use your existing helper!
             # It returns a list of (direction, nx, ny)
-            for direction, nx, ny in self._get_neighbors(x, y):
-
-                # 1. Check if there is a wall in that direction
-                if self.grid[y][x].walls[direction]:
-                    continue
-
+            try:
+                for direction, nx, ny in self._get_neighbors(x, y):
+                    # 1. Check if there is a wall in that direction
+                    if self.grid[y][x].walls[direction]:
+                        continue
                 # 2. Check if we've already been to this neighbor
-                if (nx, ny) not in visited:
-                    visited.add((nx, ny))
-                    parent[(nx, ny)] = (x, y)
-                    queue.append((nx, ny))
-
+                    if (nx, ny) not in visited:
+                        visited.add((nx, ny))
+                        parent[(nx, ny)] = (x, y)
+                        queue.append((nx, ny))
+            except (IndexError, KeyError):
+                print("Error: Entry point out off Maze boundaries")
+                sys.exit(1)
         return None
