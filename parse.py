@@ -15,7 +15,7 @@ class OutOffBound(Exception):
 
 
 def validator(argv: list[str]) -> None:
-    if len(argv) != 2 or argv[1] != "config.txt":
+    if len(argv) != 2:  # or argv[1] != "config.txt"
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
 
@@ -31,7 +31,10 @@ def read_config(file_path: str) -> dict[str, str]:
                 key, value = line.split('=', 1)
                 config[key.strip()] = value.strip()
     except FileNotFoundError:
-        print("Error")
+        print("Error: Config file not found")
+        sys.exit(1)
+    except ValueError:
+        print("Error: wrong file format")
         sys.exit(1)
 
     return config
