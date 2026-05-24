@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import sys
 from typing import Any
 
@@ -15,7 +14,7 @@ class OutOffBound(Exception):
 
 
 def validator(argv: list[str]) -> None:
-    if len(argv) != 2:  # or argv[1] != "config.txt"
+    if len(argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
 
