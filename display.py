@@ -28,52 +28,46 @@ class Color:
     BOLD_CYAN = "\033[1;96m"
 
 
-random_walls_color = random.choice([Color.WHITE,
-                                    Color.YELLOW,
-                                    Color.CYAN,
-                                    Color.GRAY,
-                                    Color.GREEN,
-                                    Color.BLUE,
-                                    Color.ORANGE,
-                                    Color.PINK,
-                                    Color.DARK_RED,
-                                    Color.DARK_GREEN,
-                                    Color.DARK_BLUE,
-                                    Color.DARK_CYAN,
-                                    Color.BOLD_WHITE,
-                                    Color.BOLD_GREEN,
-                                    Color.BOLD_YELLOW,
-                                    Color.BOLD_BLUE,
-                                    Color.BOLD_CYAN])
-
-random_42_color = random.choice([Color.WHITE,
-                                Color.YELLOW,
-                                Color.CYAN,
-                                Color.GRAY,
-                                Color.GREEN,
-                                Color.BLUE,
-                                Color.ORANGE,
-                                Color.PINK,
-                                Color.DARK_RED,
-                                Color.DARK_GREEN,
-                                Color.DARK_BLUE,
-                                Color.DARK_CYAN,
-                                Color.BOLD_WHITE,
-                                Color.BOLD_GREEN,
-                                Color.BOLD_YELLOW,
-                                Color.BOLD_BLUE,
-                                Color.BOLD_CYAN])
-
-W = random_walls_color + "██" + RESET
-S = "  "
-
-
 def display_maze(
     maze: list[list[Cell]],
     entry: tuple[int, int] | None = None,
     exit_: tuple[int, int] | None = None,
     path: list[tuple[int, int]] | None = None,
+    color_seed: int | None = None,
 ) -> None:
+    if color_seed is not None:
+        rng = random.Random(color_seed)
+
+        color_palette = [
+            Color.WHITE,
+            Color.YELLOW,
+            Color.CYAN,
+            Color.GRAY,
+            Color.GREEN,
+            Color.BLUE,
+            Color.ORANGE,
+            Color.PINK,
+            Color.DARK_RED,
+            Color.DARK_GREEN,
+            Color.DARK_BLUE,
+            Color.DARK_CYAN,
+            Color.BOLD_WHITE,
+            Color.BOLD_GREEN,
+            Color.BOLD_YELLOW,
+            Color.BOLD_BLUE,
+            Color.BOLD_CYAN,
+        ]
+        random_walls_color = rng.choice(color_palette)
+        random_42_color = rng.choice(color_palette)
+
+        W = random_walls_color + "██" + RESET
+        S = "  "
+    else:
+        random_walls_color = Color.WHITE
+        random_42_color = Color.YELLOW
+        W = Color.WHITE
+        S = "  "
+
     height = len(maze)
     width = len(maze[0])
 
