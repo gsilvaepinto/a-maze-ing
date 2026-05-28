@@ -19,7 +19,7 @@ def print_menu():
   #                                       #
   #          [1]  Generate Maze           #
   #                                       #
-  #          [2]  Solve Maze              #
+  #          [2]  Solve/Unsolve Maze      #
   #                                       #
   #          [3]  Change Color            #
   #                                       #
@@ -27,6 +27,10 @@ def print_menu():
   #                                       #
   #=======================================#
 """)
+
+
+def clear():
+    print("\033[H", end="", flush=True)
 
 
 def main() -> None:
@@ -42,44 +46,74 @@ def main() -> None:
     perfect: bool = parsed['PERFECT']
 
     color = random.randint(0, 100)
-    seed = random.randint(0, 100)
-    gen_maze = MazeGenerator(width, height, seed)
-    gen_maze.generate(perfect)
-    gen_maze.embed_42(entry, exit_)
-    path: list[tuple[int, int]] | None = gen_maze.solve_bfs(entry, exit_)
-    display_maze(gen_maze.grid, entry, exit_, None, color)
-
-    is_solved = False
-    while (1):
-        print_menu()
-        option = input("Choose a option: ").strip()
-
-        os.system('clear')
-        if option == "1":
-            seed = random.randint(0, 100)
-            gen_maze = MazeGenerator(width, height, seed)
-            gen_maze.generate(perfect)
-            gen_maze.embed_42(entry, exit_)
-            path = gen_maze.solve_bfs(entry, exit_)
-            display_maze(gen_maze.grid, entry, exit_, None, color)
-            is_solved = False
-        elif option == "2":
-            if is_solved:
-                display_maze(gen_maze.grid, entry, exit_, None, color)
-                is_solved = False
-            else:
-                display_maze(gen_maze.grid, entry, exit_, path, color)
-                is_solved = True
-        elif option == "3":
-            color = random.randint(0, 100)
-            display_maze(gen_maze.grid, entry, exit_, None, color)
-        elif option == "4":
-            print("\n  Goodbye!\n")
+    os.system('clear')
+    clear()
+    while True:
+        seed = random.randint(0, 99999999)
+        gen_maze = MazeGenerator(width, height, seed)
+        gen_maze.generate(perfect)
+        success, error = gen_maze.embed_42(entry, exit_)
+        path = gen_maze.solve_bfs(entry, exit_)
+        if path is not None:
             break
-        else:
-            continue
+    display_maze(gen_maze.grid, entry, exit_, None, color)
+    try:
+        is_solved = False
+        while (1):
+            print_menu()
+            if not success and error is not None:
+                print(error)
+            option = input("\033[2K\rChoose a option: ").strip()
 
-        write_maze_file(gen_maze.grid, output_file, entry, exit_, path)
+            if width > 15 or height > 15:
+                os.system('clear')
+            else:
+                clear()
+
+            if option == "1":
+                while (1):
+                    seed = random.randint(0, 99999999)
+                    gen_maze = MazeGenerator(width, height, seed)
+                    gen_maze.generate(perfect)
+                    success, error = gen_maze.embed_42(entry, exit_)
+                    path = gen_maze.solve_bfs(entry, exit_)
+                    if path is not None:
+                        if is_solved:
+                            display_maze(gen_maze.grid, entry, exit_, path,
+                                         color)
+                        else:
+                            display_maze(gen_maze.grid, entry, exit_, None,
+                                         color)
+                        break
+            elif option == "2":
+                if is_solved:
+                    display_maze(gen_maze.grid, entry, exit_, None, color)
+                    is_solved = False
+                else:
+                    display_maze(gen_maze.grid, entry, exit_, path, color)
+                    is_solved = True
+            elif option == "3":
+                color = random.randint(0, 100)
+                if is_solved:
+                    display_maze(gen_maze.grid, entry, exit_, path,
+                                 color)
+                else:
+                    display_maze(gen_maze.grid, entry, exit_, None,
+                                 color)
+            elif option == "4":
+                os.system('clear')
+                print("\n  Goodbye!\n")
+                break
+            else:
+                if is_solved:
+                    display_maze(gen_maze.grid, entry, exit_, path, color)
+                else:
+                    display_maze(gen_maze.grid, entry, exit_, None, color)
+
+            write_maze_file(gen_maze.grid, output_file, entry, exit_, path)
+    except KeyboardInterrupt:
+        os.system('clear')
+        print("You Exit the program")
 
 
 if __name__ == '__main__':

@@ -114,7 +114,28 @@ class MazeGenerator:
             self._remove_walls(self.grid[y][x], self.grid[ny][nx], direction)
             removed += 1
 
-    def embed_42(self, entry: tuple[int, int], exit_: tuple[int, int]) -> bool:
+    def _path_exists(self,
+                     entry: tuple[int, int],
+                     exit_: tuple[int, int]) -> bool:
+        """Internal helper to verify if a path exists between entry and exit."""
+        queue = deque([entry])
+        visited = {entry}
+
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) == exit_:
+                return True
+
+            for direction, nx, ny in self._get_neighbors(x, y):
+                if not self.grid[y][x].walls[direction]:
+                    if (nx, ny) not in visited:
+                        visited.add((nx, ny))
+                        queue.append((nx, ny))
+        return False
+
+    def embed_42(self,
+                 entry: tuple[int, int],
+                 exit_: tuple[int, int]) -> tuple[bool, Optional[str]]:
         # 1. Define the pattern (7x5 area)
         pattern = [
             (0, 0),
@@ -141,8 +162,8 @@ class MazeGenerator:
 
         # 2. MANDATORY SIZE CHECK
         if self.width < 10 or self.height < 8:
-            print("Error: Maze too small for '42' pattern. Omitting pattern.")
-            return False
+            return (False, "Error: Maze too small for '42' pattern."
+                    " Omitting pattern.")
 
         # 3. Centering Logic
         start_x = (self.width - 7) // 2
@@ -178,10 +199,10 @@ class MazeGenerator:
                         self.grid[cy][cx-1].walls["E"] = True
                     if cx < self.width - 1:
                         self.grid[cy][cx+1].walls["W"] = True
-                return True
+                return (True, None)
 
-        print("Error: Could not find a safe spot for '42' pattern. Omitting.")
-        return False
+        return (False, "Error: Could not find a safe spot for '42' pattern."
+                " Omitting.")
 
     def _reconstruct_path(
         self,
