@@ -65,7 +65,7 @@ def main() -> None:
                 print(error)
             option = input("\033[2K\rChoose a option: ").strip()
 
-            if width > 15 or height > 15:
+            if width > 16 or height > 16:
                 os.system('clear')
             else:
                 clear()
