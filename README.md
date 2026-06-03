@@ -113,9 +113,11 @@ All AI-generated content was reviewed, tested, and understood before inclusion.
 
 ## Team & Project Management
 
-**Team:** Solo — `<your-login>`
+**Team:** rparreir and guilheda
 
-**Roles:** Full implementation (generation, display, parsing, output, solving).
+**Roles:**
+- **rparreir** — config parsing (`parse.py`), maze solver (`solve_bfs`, `_reconstruct_path`)
+- **guilheda** — maze generation (`maze_generator.py`), terminal display (`display.py`), output file (`output.py`), main loop (`a_maze_ing.py`)
 
 **Planning:**
 - Phase 1: Maze generation algorithm and coherent wall structure.
@@ -127,4 +129,4 @@ All AI-generated content was reviewed, tested, and understood before inclusion.
 
 **What could be improved:** More granular error messages for edge-case config inputs.
 
-**Tools used:** VS Code, Git, mypy, flake8, Python 3.13.
+**Tools used:** VS Code, Git, mypy, flake8, Python 3.10.12.
