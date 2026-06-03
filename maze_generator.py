@@ -90,11 +90,12 @@ class MazeGenerator:
 
         while stack:
             x, y = stack[-1]
-            unvisited_neighbors = [
-                (direction, nx, ny)
-                for direction, nx, ny in self._get_neighbors(x, y)
-                if not self.grid[ny][nx].visited
-            ]
+
+            unvisited_neighbors: list[tuple[str, int, int]] = []
+            for direction, nx, ny in self._get_neighbors(x, y):
+                if not self.grid[ny][nx].visited:
+                    unvisited_neighbors.append((direction, nx, ny))
+
             if unvisited_neighbors:
                 direction, nx, ny = random.choice(unvisited_neighbors)
                 current_cell = self.grid[y][x]
@@ -206,7 +207,7 @@ class MazeGenerator:
 
             overlap = False
             for dx, dy in pattern:
-                if (sx + dx, sy + dy) in [entry, exit_]:
+                if (sx + dx, sy + dy) in {entry, exit_}:
                     overlap = True
                     break
 
@@ -216,7 +217,7 @@ class MazeGenerator:
                     cell = self.grid[cy][cx]
                     cell.is_42 = True
                     cell.visited = True
-                    cell.walls = {k: True for k in "NESW"}
+                    cell.walls = {"N": True, "E": True, "S": True, "W": True}
 
                     if cy > 0:
                         self.grid[cy-1][cx].walls["S"] = True

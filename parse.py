@@ -87,6 +87,10 @@ def out_of_boundaries(height: int,
     if not (0 <= xx < width and 0 <= xy < height):
         config_report.append(f"Error: EXIT {exit} is out of boundaries for"
                              f" maze {width}x{height}")
+
+    if entry == exit:
+        config_report.append("Error: ENTRY and EXIT must be different cells")
+
     return config_report
 
 
