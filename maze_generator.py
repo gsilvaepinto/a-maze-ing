@@ -6,7 +6,10 @@ import sys
 
 
 class Cell:
+    """Represents a single cell in the maze grid."""
+
     def __init__(self) -> None:
+        """Initialize a cell with all four walls closed."""
         self.walls: dict[str, bool] = {
             "N": True,
             "E": True,
@@ -18,12 +21,21 @@ class Cell:
 
 
 class MazeGenerator:
+    """Generates a maze using the recursive backtracker (DFS) algorithm."""
+
     def __init__(
         self,
         width: int,
         height: int,
         seed: Optional[int] = None,
     ) -> None:
+        """Initialize the maze generator.
+
+        Args:
+            width: Number of columns.
+            height: Number of rows.
+            seed: Optional random seed for reproducibility.
+        """
         self.width: int = width
         self.height: int = height
         self.grid: list[list[Cell]] = [
@@ -33,6 +45,7 @@ class MazeGenerator:
             random.seed(seed)
 
     def _get_neighbors(self, x: int, y: int) -> list[tuple[str, int, int]]:
+        """Return valid cardinal neighbours as (direction, nx, ny) tuples."""
         neighbors: list[tuple[str, int, int]] = []
         if y > 0:
             neighbors.append(("N", x, y - 1))
@@ -50,6 +63,7 @@ class MazeGenerator:
         next_cell: Cell,
         direction: str,
     ) -> None:
+        """Remove the shared wall between two adjacent cells."""
         if direction == "N":
             current_cell.walls["N"] = False
             next_cell.walls["S"] = False
@@ -64,7 +78,12 @@ class MazeGenerator:
             next_cell.walls["E"] = False
 
     def generate(self, perfect: bool = True) -> None:
+        """Generate the maze using recursive backtracker (DFS).
 
+        Args:
+            perfect: If True, produces a perfect maze (one path between any two
+                     cells). If False, extra walls are removed to create loops.
+        """
         x, y = 0, 0
         self.grid[y][x].visited = True
         stack: list[tuple[int, int]] = [(x, y)]
@@ -90,6 +109,11 @@ class MazeGenerator:
             self.non_perfect_maze(self.width // 2)
 
     def non_perfect_maze(self, count: int) -> None:
+        """Remove random walls to introduce loops and alternative paths.
+
+        Args:
+            count: Number of walls to remove.
+        """
         removed = 0
         attempts = 0
         max_attempts = count * 10
@@ -117,7 +141,7 @@ class MazeGenerator:
     def _path_exists(self,
                      entry: tuple[int, int],
                      exit_: tuple[int, int]) -> bool:
-        """Internal helper to verify if a path exists between entry and exit."""
+        """Return True if a path exists between entry and exit."""
         queue = deque([entry])
         visited = {entry}
 
@@ -136,7 +160,16 @@ class MazeGenerator:
     def embed_42(self,
                  entry: tuple[int, int],
                  exit_: tuple[int, int]) -> tuple[bool, Optional[str]]:
-        # 1. Define the pattern (7x5 area)
+        """Stamp the '42' pattern onto the maze as fully closed cells.
+
+        Args:
+            entry: Entry cell coordinates (x, y).
+            exit_: Exit cell coordinates (x, y).
+
+        Returns:
+            Tuple of (success, error_message).
+            error_message is None on success.
+        """
         pattern = [
             (0, 0),
             (0, 1),
@@ -160,21 +193,17 @@ class MazeGenerator:
             (6, 4),
         ]
 
-        # 2. MANDATORY SIZE CHECK
         if self.width < 10 or self.height < 8:
             return (False, "Error: Maze too small for '42' pattern."
                     " Omitting pattern.")
 
-        # 3. Centering Logic
         start_x = (self.width - 7) // 2
         start_y = (self.height - 5) // 2
 
-        # 4. Safety Nudge (if it hits entry/exit)
         offsets = [(0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)]
         for nx, ny in offsets:
             sx, sy = start_x + nx, start_y + ny
 
-            # Check if this position overlaps entry or exit
             overlap = False
             for dx, dy in pattern:
                 if (sx + dx, sy + dy) in [entry, exit_]:
@@ -182,7 +211,6 @@ class MazeGenerator:
                     break
 
             if not overlap:
-                # 5. Stamp the pattern
                 for dx, dy in pattern:
                     cx, cy = sx + dx, sy + dy
                     cell = self.grid[cy][cx]
@@ -190,7 +218,6 @@ class MazeGenerator:
                     cell.visited = True
                     cell.walls = {k: True for k in "NESW"}
 
-                    # 6. COHERENCY: Close neighbor walls
                     if cy > 0:
                         self.grid[cy-1][cx].walls["S"] = True
                     if cy < self.height - 1:
@@ -209,6 +236,15 @@ class MazeGenerator:
         parent: dict[tuple[int, int], tuple[int, int] | None],
         end: tuple[int, int],
     ) -> list[tuple[int, int]]:
+        """Reconstruct the path from BFS parent map from start to end.
+
+        Args:
+            parent: Dict mapping each cell to its predecessor.
+            end: The destination cell.
+
+        Returns:
+            List of (x, y) coordinates from start to end.
+        """
         path: list[tuple[int, int]] = []
         current: tuple[int, int] | None = end
         while current is not None:
@@ -221,6 +257,15 @@ class MazeGenerator:
         entry: tuple[int, int],
         exit_: tuple[int, int],
     ) -> list[tuple[int, int]] | None:
+        """Find the shortest path from entry to exit using BFS.
+
+        Args:
+            entry: Start cell coordinates (x, y).
+            exit_: End cell coordinates (x, y).
+
+        Returns:
+            List of (x, y) tuples from entry to exit, or None if unreachable.
+        """
         queue: deque[tuple[int, int]] = deque([entry])
         visited: set[tuple[int, int]] = {entry}
         parent: dict[tuple[int, int], tuple[int, int] | None] = {entry: None}
@@ -231,14 +276,10 @@ class MazeGenerator:
             if (x, y) == exit_:
                 return self._reconstruct_path(parent, exit_)
 
-            # Use your existing helper!
-            # It returns a list of (direction, nx, ny)
             try:
                 for direction, nx, ny in self._get_neighbors(x, y):
-                    # 1. Check if there is a wall in that direction
                     if self.grid[y][x].walls[direction]:
                         continue
-                # 2. Check if we've already been to this neighbor
                     if (nx, ny) not in visited:
                         visited.add((nx, ny))
                         parent[(nx, ny)] = (x, y)

@@ -4,22 +4,37 @@ from typing import Any
 
 
 class ParsingError(Exception):
-    def __init__(self, message="") -> None:
+    """Raised when a config value is present but invalid."""
+
+    def __init__(self, message: str = "") -> None:
+        """Initialize with an optional error message."""
         super().__init__(message)
 
 
 class OutOffBound(Exception):
-    def __init__(self, message="") -> None:
+    """Raised when coordinates fall outside maze boundaries."""
+
+    def __init__(self, message: str = "") -> None:
+        """Initialize with an optional error message."""
         super().__init__(message)
 
 
 def validator(argv: list[str]) -> None:
+    """Validate that exactly one command-line argument was provided."""
     if len(argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
 
 
 def read_config(file_path: str) -> dict[str, str]:
+    """Read a KEY=VALUE config file and return a raw string dict.
+
+    Args:
+        file_path: Path to the configuration file.
+
+    Returns:
+        Dict mapping each key to its raw string value.
+    """
     config: dict[str, str] = {}
     try:
         with open(file_path) as file:
@@ -40,6 +55,7 @@ def read_config(file_path: str) -> dict[str, str]:
 
 
 def parse_coordinates(value: str) -> tuple[int, int]:
+    """Parse a 'x,y' string into a tuple of ints."""
     x, y = value.split(',')
     return int(x), int(y)
 
@@ -49,6 +65,18 @@ def out_of_boundaries(height: int,
                       entry: tuple[int, int],
                       exit: tuple[int, int],
                       config_report: list[str]) -> list[str]:
+    """Append errors to config_report if entry or exit are outside maze bounds.
+
+    Args:
+        height: Maze height in cells.
+        width: Maze width in cells.
+        entry: Entry coordinates (x, y).
+        exit: Exit coordinates (x, y).
+        config_report: Accumulator list for error messages.
+
+    Returns:
+        The updated config_report list.
+    """
     ex, ey = entry
     xx, xy = exit
 
@@ -63,6 +91,15 @@ def out_of_boundaries(height: int,
 
 
 def parse_config(config: dict[str, str]) -> dict[str, Any]:
+    """Validate and convert the raw config dict into typed values.
+
+    Args:
+        config: Raw string dict from read_config.
+
+    Returns:
+        Dict with typed values for WIDTH, HEIGHT, ENTRY, EXIT,
+        OUTPUT_FILE, and PERFECT.
+    """
     parsed: dict[str, Any] = {}
     config_report: list[str] = []
 

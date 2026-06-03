@@ -11,7 +11,8 @@ from output import write_maze_file
 from parse import read_config, parse_config, validator
 
 
-def print_menu():
+def print_menu() -> None:
+    """Print the interactive menu options."""
     print(r"""
   #=======================================#
   #          A _ M a z e _ i n g          #
@@ -29,11 +30,13 @@ def print_menu():
 """)
 
 
-def clear():
+def clear() -> None:
+    """Move terminal cursor to top-left without clearing the screen."""
     print("\033[H", end="", flush=True)
 
 
 def main() -> None:
+    """Parse config, generate the maze, and run the interactive loop."""
     validator(sys.argv)
     config: dict[str, str] = read_config(sys.argv[1])
     parsed: dict[str, Any] = parse_config(config)

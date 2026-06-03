@@ -1,4 +1,17 @@
-def cell_to_hex(cell) -> str:
+from maze_generator import Cell
+
+
+def cell_to_hex(cell: Cell) -> str:
+    """Encode a cell's wall state as a single uppercase hex digit.
+
+    Each bit represents a closed wall: bit 0 = N, 1 = E, 2 = S, 3 = W.
+
+    Args:
+        cell: The Cell to encode.
+
+    Returns:
+        A single uppercase hex character ('0'–'F').
+    """
     value = 0
 
     if cell.walls['N']:
@@ -12,9 +25,19 @@ def cell_to_hex(cell) -> str:
     return format(value, 'X')
 
 
-def write_maze_file(maze, output_file: str, entry: tuple[int, int],
+def write_maze_file(maze: list[list[Cell]], output_file: str,
+                    entry: tuple[int, int],
                     exit: tuple[int, int],
                     path: list[tuple[int, int]] | None = None) -> None:
+    """Write the maze to a file in hex format with entry, exit, and path.
+
+    Args:
+        maze: 2-D grid of Cell objects indexed as maze[y][x].
+        output_file: Path to the output file.
+        entry: Entry coordinates (x, y).
+        exit: Exit coordinates (x, y).
+        path: Solution path as a list of (x, y) tuples, or None.
+    """
     with open(output_file, 'w') as file:
         for row in maze:
             line = ''

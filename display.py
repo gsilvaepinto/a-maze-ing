@@ -6,6 +6,8 @@ RESET = "\033[0m"
 
 
 class Color:
+    """ANSI escape codes for terminal text colours."""
+
     WHITE = "\033[97m"
     RED = "\033[91m"
     PURPLE = "\033[95m"
@@ -35,6 +37,15 @@ def display_maze(
     path: list[tuple[int, int]] | None = None,
     color_seed: int | None = None,
 ) -> None:
+    """Render the maze to the terminal using Unicode block characters.
+
+    Args:
+        maze: 2-D grid of Cell objects indexed as maze[y][x].
+        entry: Entry cell coordinates (x, y), shown in purple.
+        exit_: Exit cell coordinates (x, y), shown in red.
+        path: Solution path as a list of (x, y) tuples, shown in yellow.
+        color_seed: Seed for random wall colour selection. None uses white.
+    """
     if color_seed is not None:
         rng = random.Random(color_seed)
 
