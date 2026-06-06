@@ -198,39 +198,36 @@ class MazeGenerator:
             return (False, "Error: Maze too small for '42' pattern."
                     " Omitting pattern.")
 
-        start_x = (self.width - 7) // 2
-        start_y = (self.height - 5) // 2
+        sx = (self.width - 7) // 2
+        sy = (self.height - 5) // 2
 
-        offsets = [(0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)]
-        for nx, ny in offsets:
-            sx, sy = start_x + nx, start_y + ny
+        overlap = False
+        for dx, dy in pattern:
+            if (sx + dx, sy + dy) in {entry, exit_}:
+                overlap = True
+                break
 
-            overlap = False
-            for dx, dy in pattern:
-                if (sx + dx, sy + dy) in {entry, exit_}:
-                    overlap = True
-                    break
+        if overlap:
+            return (False, "Error: entry or exit point overlaps"
+                    " with '42' pattern. Omitting.")
 
-            if not overlap:
-                for dx, dy in pattern:
-                    cx, cy = sx + dx, sy + dy
-                    cell = self.grid[cy][cx]
-                    cell.is_42 = True
-                    cell.visited = True
-                    cell.walls = {"N": True, "E": True, "S": True, "W": True}
+        for dx, dy in pattern:
+            cx, cy = sx + dx, sy + dy
+            cell = self.grid[cy][cx]
+            cell.is_42 = True
+            cell.visited = True
+            cell.walls = {"N": True, "E": True, "S": True, "W": True}
 
-                    if cy > 0:
-                        self.grid[cy-1][cx].walls["S"] = True
-                    if cy < self.height - 1:
-                        self.grid[cy+1][cx].walls["N"] = True
-                    if cx > 0:
-                        self.grid[cy][cx-1].walls["E"] = True
-                    if cx < self.width - 1:
-                        self.grid[cy][cx+1].walls["W"] = True
-                return (True, None)
+            if cy > 0:
+                self.grid[cy-1][cx].walls["S"] = True
+            if cy < self.height - 1:
+                self.grid[cy+1][cx].walls["N"] = True
+            if cx > 0:
+                self.grid[cy][cx-1].walls["E"] = True
+            if cx < self.width - 1:
+                self.grid[cy][cx+1].walls["W"] = True
 
-        return (False, "Error: Could not find a safe spot for '42' pattern."
-                " Omitting.")
+        return (True, None)
 
     def _reconstruct_path(
         self,
