@@ -54,8 +54,8 @@ def main() -> None:
     while True:
         seed = random.randint(0, 99999999)
         gen_maze = MazeGenerator(width, height, seed)
-        gen_maze.generate(perfect)
         success, error = gen_maze.embed_42(entry, exit_)
+        gen_maze.generate(perfect)
         path = gen_maze.solve_bfs(entry, exit_)
         if path is not None:
             break
@@ -77,8 +77,8 @@ def main() -> None:
                 while (1):
                     seed = random.randint(0, 99999999)
                     gen_maze = MazeGenerator(width, height, seed)
-                    gen_maze.generate(perfect)
                     success, error = gen_maze.embed_42(entry, exit_)
+                    gen_maze.generate(perfect)
                     path = gen_maze.solve_bfs(entry, exit_)
                     if path is not None:
                         if is_solved:
